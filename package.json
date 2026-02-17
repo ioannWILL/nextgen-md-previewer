@@ -1,0 +1,114 @@
+{
+  "name": "nextgen-md-previewer",
+  "displayName": "NextGen .md Previewer",
+  "description": "A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without switching to raw mode.",
+  "version": "0.1.0",
+  "publisher": "ioannWILL",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ioannWILL/nextgen-md-previewer.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "markdown",
+    "wysiwyg",
+    "preview",
+    "editor",
+    "md"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "nextgenMdPreviewer.open",
+        "title": "Preview with NextGen .md Previewer"
+      }
+    ],
+    "menus": {
+      "editor/title/context": [
+        {
+          "command": "nextgenMdPreviewer.open",
+          "when": "resourceLangId == markdown",
+          "group": "1_open"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "NextGen .md Previewer",
+      "properties": {
+        "nextgenMdPreviewer.autoSaveDelay": {
+          "type": "number",
+          "default": 1000,
+          "minimum": 100,
+          "maximum": 10000,
+          "description": "Delay in milliseconds before auto-saving changes to the file"
+        },
+        "nextgenMdPreviewer.toolbar.visible": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the formatting toolbar"
+        },
+        "nextgenMdPreviewer.toolbar.position": {
+          "type": "string",
+          "enum": ["top", "floating"],
+          "default": "floating",
+          "description": "Toolbar position: fixed at top or floating on selection"
+        },
+        "nextgenMdPreviewer.features.math": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable LaTeX math equation rendering"
+        },
+        "nextgenMdPreviewer.features.mermaid": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Mermaid diagram rendering"
+        },
+        "nextgenMdPreviewer.images.folder": {
+          "type": "string",
+          "default": "assets",
+          "description": "Folder name for uploaded images (relative to document)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "lint": "eslint src --ext ts",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.x",
+    "@typescript-eslint/parser": "^7.x",
+    "esbuild": "^0.20.x",
+    "eslint": "^8.x",
+    "typescript": "^5.x",
+    "vitest": "^1.x"
+  },
+  "dependencies": {
+    "@milkdown/core": "^7.x",
+    "@milkdown/ctx": "^7.x",
+    "@milkdown/preset-commonmark": "^7.x",
+    "@milkdown/preset-gfm": "^7.x",
+    "@milkdown/plugin-listener": "^7.x",
+    "@milkdown/plugin-math": "^7.x",
+    "@milkdown/plugin-diagram": "^7.x",
+    "katex": "^0.16.x",
+    "mermaid": "^10.x",
+    "prismjs": "^1.29.x"
+  }
+}
