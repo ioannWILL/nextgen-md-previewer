@@ -31,7 +31,7 @@
     "commands": [
       {
         "command": "nextgenMdPreviewer.open",
-        "title": "Preview with NextGen .md Previewer"
+        "title": "NextGen Preview"
       }
     ],
     "menus": {
