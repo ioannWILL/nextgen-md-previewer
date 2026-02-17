@@ -25,7 +25,7 @@ export class EditorManager implements vscode.Disposable {
     const panel = vscode.window.createWebviewPanel(
       'nextgenMdPreviewer',
       `Preview: ${this.getFileName(uri)}`,
-      vscode.ViewColumn.Beside,
+      vscode.ViewColumn.Active,
       {
         enableScripts: true,
         retainContextWhenHidden: true,
@@ -91,6 +91,7 @@ export class EditorManager implements vscode.Disposable {
       color: var(--vscode-editor-foreground);
       font-family: var(--vscode-font-family);
       font-size: var(--vscode-font-size);
+      line-height: 1.6;
     }
     #editor {
       min-height: 100vh;
@@ -98,6 +99,84 @@ export class EditorManager implements vscode.Disposable {
     }
     .milkdown {
       background: transparent;
+    }
+    /* Code blocks */
+    pre {
+      background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+      border: 1px solid var(--vscode-panel-border, rgba(127, 127, 127, 0.2));
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+    pre code {
+      font-family: var(--vscode-editor-font-family, 'Consolas', 'Courier New', monospace);
+      font-size: var(--vscode-editor-font-size, 13px);
+      background: transparent;
+      padding: 0;
+    }
+    /* Inline code */
+    code {
+      font-family: var(--vscode-editor-font-family, 'Consolas', 'Courier New', monospace);
+      background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    /* Tables */
+    table {
+      border-collapse: collapse;
+      margin: 16px 0;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid var(--vscode-panel-border, rgba(127, 127, 127, 0.3));
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+      font-weight: 600;
+    }
+    /* Blockquotes */
+    blockquote {
+      border-left: 4px solid var(--vscode-textBlockQuote-border, #007acc);
+      margin: 16px 0;
+      padding: 8px 16px;
+      background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.05));
+    }
+    /* Task lists */
+    li[data-checked] {
+      list-style: none;
+      margin-left: -1.5em;
+    }
+    li[data-checked]::before {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      border: 1px solid var(--vscode-checkbox-border, #6b6b6b);
+      border-radius: 3px;
+      vertical-align: middle;
+    }
+    li[data-checked="true"]::before {
+      background: var(--vscode-checkbox-background, #007acc);
+      border-color: var(--vscode-checkbox-background, #007acc);
+    }
+    /* Horizontal rule */
+    hr {
+      border: none;
+      border-top: 1px solid var(--vscode-panel-border, rgba(127, 127, 127, 0.3));
+      margin: 24px 0;
+    }
+    /* Links */
+    a {
+      color: var(--vscode-textLink-foreground, #3794ff);
+    }
+    a:hover {
+      color: var(--vscode-textLink-activeForeground, #3794ff);
+      text-decoration: underline;
     }
   </style>
 </head>

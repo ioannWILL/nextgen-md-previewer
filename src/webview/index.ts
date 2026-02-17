@@ -1,5 +1,6 @@
 import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
 import { commonmark } from '@milkdown/preset-commonmark';
+import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
 
 declare global {
@@ -41,6 +42,7 @@ class WYSIWYGEditor {
         });
       })
       .use(commonmark)
+      .use(gfm)
       .use(listener)
       .create();
 
