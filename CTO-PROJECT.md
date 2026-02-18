@@ -183,6 +183,12 @@ nextgen-md-previewer/
 - Feature branches: `feature/<description>`
 - Commit messages: Conventional Commits format recommended
 
+### Publishing Workflow
+- **Publishing is manual** - Only publish when the user explicitly requests it
+- Commits to `main` do NOT trigger automatic publishing
+- To publish: user must explicitly say "publish" or "release"
+- Publish to both VS Code Marketplace and Open VSX (Cursor)
+
 ### Testing
 - Test framework: Vitest
 - Run tests: `npm test`

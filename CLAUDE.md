@@ -71,6 +71,16 @@ Activated via `editor/title/context` menu on markdown files. The command `nextge
 - Floating toolbar
 - Image drag-and-drop handler
 
+## Publishing
+
+**IMPORTANT:** Publishing is manual and requires explicit user request.
+
+- Do NOT publish automatically after commits to `main`
+- Only publish when user explicitly says "publish", "release", or similar
+- Publish to both marketplaces:
+  - VS Code Marketplace: `vsce publish`
+  - Open VSX (Cursor): `ovsx publish`
+
 ## Related Files
 
 - **CTO-PROJECT.md** - Comprehensive project documentation for AI assistants (vision, architecture, rules)
