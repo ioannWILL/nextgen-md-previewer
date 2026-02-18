@@ -6,12 +6,24 @@ let editorManager: EditorManager;
 // Track documents that were open on activation (skip auto-open for these once)
 const initialDocuments = new Set<string>();
 
+// Track documents whose preview was manually closed (don't auto-reopen until user switches away)
+const manuallyClosed = new Set<string>();
+
+// Track the last active document to know when user switches away
+let lastActiveDocument: string | undefined;
+
 export function activate(context: vscode.ExtensionContext) {
   editorManager = new EditorManager(context);
 
   // Record initially open editors to avoid auto-opening on reload
   vscode.window.visibleTextEditors.forEach((editor) => {
     initialDocuments.add(editor.document.uri.toString());
+  });
+
+  // Listen for panel close events to track manually closed previews
+  const panelCloseListener = editorManager.onPanelClosed((uri) => {
+    // Mark as manually closed so we don't auto-reopen immediately
+    manuallyClosed.add(uri);
   });
 
   // Register the command to open the WYSIWYG preview
@@ -33,6 +45,9 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      // Clear manually closed flag since user explicitly requested preview
+      manuallyClosed.delete(targetUri.toString());
+
       await editorManager.openPreview(targetUri);
     }
   );
@@ -43,17 +58,28 @@ export function activate(context: vscode.ExtensionContext) {
       return;
     }
 
+    const document = editor.document;
+    const uri = document.uri.toString();
+
+    // When switching to a different document, clear the manually closed flag for the previous one
+    if (lastActiveDocument && lastActiveDocument !== uri) {
+      manuallyClosed.delete(lastActiveDocument);
+    }
+    lastActiveDocument = uri;
+
     const config = vscode.workspace.getConfiguration('nextgenMdPreviewer');
     if (!config.get<boolean>('autoOpen', false)) {
       return;
     }
 
-    const document = editor.document;
-    const uri = document.uri.toString();
-
     // Skip initially open documents (only once, then allow auto-open)
     if (initialDocuments.has(uri)) {
       initialDocuments.delete(uri);
+      return;
+    }
+
+    // Skip if user manually closed the preview for this document
+    if (manuallyClosed.has(uri)) {
       return;
     }
 
@@ -70,7 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
     }, 150);
   });
 
-  context.subscriptions.push(openPreviewCommand, autoOpenListener);
+  context.subscriptions.push(openPreviewCommand, autoOpenListener, panelCloseListener);
 }
 
 export function deactivate() {

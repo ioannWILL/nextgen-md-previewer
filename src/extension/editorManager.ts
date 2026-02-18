@@ -7,7 +7,16 @@ export class EditorManager implements vscode.Disposable {
   private syncControllers: Map<string, SyncController> = new Map();
   private disposables: vscode.Disposable[] = [];
 
+  // Event emitter for panel close notifications
+  private readonly _onPanelClosed = new vscode.EventEmitter<string>();
+  public readonly onPanelClosed = this._onPanelClosed.event;
+
   constructor(private readonly context: vscode.ExtensionContext) {}
+
+  // Check if a preview panel exists for the given URI
+  hasPanel(uri: vscode.Uri): boolean {
+    return this.panels.has(uri.toString());
+  }
 
   private getConfig() {
     return vscode.workspace.getConfiguration('nextgenMdPreviewer');
@@ -67,6 +76,8 @@ export class EditorManager implements vscode.Disposable {
         await controller.dispose();
         this.syncControllers.delete(key);
       }
+      // Notify listeners that panel was closed
+      this._onPanelClosed.fire(key);
     });
   }
 
@@ -225,5 +236,6 @@ export class EditorManager implements vscode.Disposable {
     this.panels.forEach((panel) => panel.dispose());
     this.syncControllers.clear();
     this.disposables.forEach((d) => d.dispose());
+    this._onPanelClosed.dispose();
   }
 }
