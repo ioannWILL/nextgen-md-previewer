@@ -3,15 +3,15 @@ import { EditorManager } from './editorManager';
 
 let editorManager: EditorManager;
 
-// Track documents that were already open when extension activated
-const initiallyOpenDocs = new Set<string>();
+// Track documents that already have preview opened to avoid duplicates
+const openedPreviews = new Set<string>();
 
 export function activate(context: vscode.ExtensionContext) {
   editorManager = new EditorManager(context);
 
-  // Record initially open documents to avoid auto-opening on reload
-  vscode.workspace.textDocuments.forEach((doc) => {
-    initiallyOpenDocs.add(doc.uri.toString());
+  // Record initially open editors to avoid auto-opening on reload
+  vscode.window.visibleTextEditors.forEach((editor) => {
+    openedPreviews.add(editor.document.uri.toString());
   });
 
   // Register the command to open the WYSIWYG preview
@@ -37,27 +37,38 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Auto-open preview when markdown files are opened
-  const autoOpenListener = vscode.workspace.onDidOpenTextDocument(async (document) => {
+  // Auto-open preview when switching to a markdown file
+  const autoOpenListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+    if (!editor) {
+      return;
+    }
+
     const config = vscode.workspace.getConfiguration('nextgenMdPreviewer');
     if (!config.get<boolean>('autoOpen', false)) {
       return;
     }
 
-    // Skip if document was already open when extension activated
-    if (initiallyOpenDocs.has(document.uri.toString())) {
+    const document = editor.document;
+    const uri = document.uri.toString();
+
+    // Skip if preview already opened for this document
+    if (openedPreviews.has(uri)) {
       return;
     }
 
     // Check if it's a markdown file
-    if (document.languageId !== 'markdown') {
+    const lowerPath = document.uri.fsPath.toLowerCase();
+    if (!lowerPath.endsWith('.md') && !lowerPath.endsWith('.markdown')) {
       return;
     }
 
-    // Small delay to allow the editor to fully open first
+    // Mark as opened to prevent duplicate previews
+    openedPreviews.add(uri);
+
+    // Small delay to allow the editor to fully render
     setTimeout(async () => {
       await editorManager.openPreview(document.uri);
-    }, 100);
+    }, 150);
   });
 
   context.subscriptions.push(openPreviewCommand, autoOpenListener);
