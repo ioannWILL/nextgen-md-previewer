@@ -3,8 +3,9 @@
   "displayName": "NextGen .md Previewer",
   "description": "A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without switching to raw mode.",
   "version": "0.1.0",
-  "publisher": "ioannWILL",
+  "publisher": "IvanVilchavskyi",
   "license": "MIT",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/ioannWILL/nextgen-md-previewer.git"

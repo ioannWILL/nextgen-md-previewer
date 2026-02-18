@@ -2,7 +2,7 @@
 
 > This file serves as the source of truth for AI assistants working on this project. Keep it updated as the project evolves.
 
-**Repository:** https://github.com/ioannWILL/nextgen-md-previewer
+**Repository:** https://github.com/IvanVilchavskyi/nextgen-md-previewer
 
 ## Product Vision
 
