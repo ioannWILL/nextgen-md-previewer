@@ -2,7 +2,7 @@
   "name": "nextgen-md-previewer",
   "displayName": "NextGen .md Previewer",
   "description": "A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without switching to raw mode.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "IvanVilchavskyi",
   "license": "MIT",
   "icon": "icon.png",
@@ -53,6 +53,21 @@
           "minimum": 100,
           "maximum": 10000,
           "description": "Delay in milliseconds before auto-saving changes to the file"
+        },
+        "nextgenMdPreviewer.previewLocation": {
+          "type": "string",
+          "enum": ["sameTab", "sideBySide"],
+          "default": "sameTab",
+          "enumDescriptions": [
+            "Open preview in a new tab in the same editor group",
+            "Open preview in a new editor group to the side"
+          ],
+          "description": "Where to open the preview panel"
+        },
+        "nextgenMdPreviewer.autoOpen": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically open preview when a markdown file is opened"
         },
         "nextgenMdPreviewer.toolbar.visible": {
           "type": "boolean",

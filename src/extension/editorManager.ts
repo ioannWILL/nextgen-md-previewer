@@ -9,6 +9,10 @@ export class EditorManager implements vscode.Disposable {
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
+  private getConfig() {
+    return vscode.workspace.getConfiguration('nextgenMdPreviewer');
+  }
+
   async openPreview(uri: vscode.Uri): Promise<void> {
     const key = uri.toString();
 
@@ -22,11 +26,18 @@ export class EditorManager implements vscode.Disposable {
     // Open the document
     const document = await vscode.workspace.openTextDocument(uri);
 
+    // Determine view column based on setting
+    const config = this.getConfig();
+    const previewLocation = config.get<string>('previewLocation', 'sameTab');
+    const viewColumn = previewLocation === 'sideBySide'
+      ? vscode.ViewColumn.Beside
+      : vscode.ViewColumn.Active;
+
     // Create webview panel
     const panel = vscode.window.createWebviewPanel(
       'nextgenMdPreviewer',
       `Preview: ${this.getFileName(uri)}`,
-      vscode.ViewColumn.Active,
+      viewColumn,
       {
         enableScripts: true,
         retainContextWhenHidden: true,
@@ -87,7 +98,10 @@ export class EditorManager implements vscode.Disposable {
   <style>
     body {
       margin: 0;
-      padding: 16px;
+      padding: 26px;
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
       background: var(--vscode-editor-background);
       color: var(--vscode-editor-foreground);
       font-family: var(--vscode-font-family);

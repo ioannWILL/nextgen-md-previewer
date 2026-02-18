@@ -227,6 +227,8 @@ npm run vscode:prepublish    # Production build
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `nextgenMdPreviewer.autoSaveDelay` | `1000` | Delay (ms) before auto-saving changes |
+| `nextgenMdPreviewer.previewLocation` | `"sameTab"` | Where to open preview: `"sameTab"` or `"sideBySide"` |
+| `nextgenMdPreviewer.autoOpen` | `false` | Automatically open preview when a markdown file is opened |
 | `nextgenMdPreviewer.toolbar.visible` | `true` | Show formatting toolbar |
 | `nextgenMdPreviewer.toolbar.position` | `"floating"` | Toolbar position: `"top"` or `"floating"` |
 | `nextgenMdPreviewer.features.math` | `true` | Enable LaTeX math rendering |
