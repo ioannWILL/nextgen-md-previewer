@@ -31,7 +31,7 @@
     "commands": [
       {
         "command": "nextgenMdPreviewer.open",
-        "title": "NextGen Preview"
+        "title": "Preview with NextGen .md Previewer"
       }
     ],
     "menus": {
@@ -86,17 +86,17 @@
     "vscode:prepublish": "npm run build",
     "build": "node esbuild.config.mjs",
     "watch": "node esbuild.config.mjs --watch",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src/",
     "test": "vitest"
   },
   "devDependencies": {
+    "@eslint/js": "^9.x",
     "@types/node": "^20.x",
     "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^7.x",
-    "@typescript-eslint/parser": "^7.x",
     "esbuild": "^0.20.x",
-    "eslint": "^8.x",
+    "eslint": "^9.x",
     "typescript": "^5.x",
+    "typescript-eslint": "^8.x",
     "vitest": "^1.x"
   },
   "dependencies": {

@@ -48,11 +48,14 @@ export class EditorManager implements vscode.Disposable {
     // Set webview HTML content
     panel.webview.html = this.getWebviewContent(panel.webview, document.getText());
 
-    // Handle panel disposal
-    panel.onDidDispose(() => {
+    // Handle panel disposal - await sync controller flush
+    panel.onDidDispose(async () => {
       this.panels.delete(key);
-      this.syncControllers.get(key)?.dispose();
-      this.syncControllers.delete(key);
+      const controller = this.syncControllers.get(key);
+      if (controller) {
+        await controller.dispose();
+        this.syncControllers.delete(key);
+      }
     });
   }
 
@@ -198,9 +201,15 @@ export class EditorManager implements vscode.Disposable {
     return text;
   }
 
-  dispose(): void {
+  async dispose(): Promise<void> {
+    // Flush all pending changes before disposing
+    const flushPromises = Array.from(this.syncControllers.values()).map(
+      (controller) => controller.dispose()
+    );
+    await Promise.all(flushPromises);
+
     this.panels.forEach((panel) => panel.dispose());
-    this.syncControllers.forEach((controller) => controller.dispose());
+    this.syncControllers.clear();
     this.disposables.forEach((d) => d.dispose());
   }
 }

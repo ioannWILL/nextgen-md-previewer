@@ -5,8 +5,9 @@ export class SyncController implements vscode.Disposable {
   private disposables: vscode.Disposable[] = [];
   private saveTimeout: NodeJS.Timeout | null = null;
   private pendingContent: string | null = null;
-  private updateVersion = 0;
+  private isApplying = false;
   private isUpdatingFromExtension = false;
+  private needsResyncOnVisible = false;
   private readonly debounceMs: number;
   private readonly documentUri: vscode.Uri;
 
@@ -20,6 +21,7 @@ export class SyncController implements vscode.Disposable {
 
     this.setupMessageHandling();
     this.setupDocumentWatcher();
+    this.setupVisibilityHandler();
   }
 
   private getDocument(): vscode.TextDocument | undefined {
@@ -63,9 +65,24 @@ export class SyncController implements vscode.Disposable {
     this.disposables.push(changeDisposable);
   }
 
-  private sendContentToWebview(): void {
-    // Don't send if panel is not visible
-    if (!this.panel.visible) return;
+  private setupVisibilityHandler(): void {
+    // Resync when panel becomes visible again
+    const visibilityDisposable = this.panel.onDidChangeViewState((e) => {
+      if (e.webviewPanel.visible && this.needsResyncOnVisible) {
+        this.needsResyncOnVisible = false;
+        this.sendContentToWebview(true);
+      }
+    });
+
+    this.disposables.push(visibilityDisposable);
+  }
+
+  private sendContentToWebview(force = false): void {
+    // If panel is not visible, mark for resync on reveal
+    if (!this.panel.visible && !force) {
+      this.needsResyncOnVisible = true;
+      return;
+    }
 
     const document = this.getDocument();
     if (!document) return;
@@ -90,21 +107,28 @@ export class SyncController implements vscode.Disposable {
   }
 
   private async applyChanges(): Promise<void> {
+    // Prevent concurrent applies
+    if (this.isApplying) return;
     if (this.pendingContent === null) return;
+
+    // Capture the content to write and clear pending immediately
+    // This allows new edits to queue up while we're writing
+    const contentToWrite = this.pendingContent;
+    this.pendingContent = null;
+    this.isApplying = true;
 
     const document = this.getDocument();
     if (!document) {
-      this.pendingContent = null;
+      this.isApplying = false;
       return;
     }
 
     const currentContent = document.getText();
-    if (currentContent === this.pendingContent) {
-      this.pendingContent = null;
+    if (currentContent === contentToWrite) {
+      this.isApplying = false;
       return;
     }
 
-    const thisUpdate = ++this.updateVersion;
     this.isUpdatingFromExtension = true;
 
     try {
@@ -113,7 +137,7 @@ export class SyncController implements vscode.Disposable {
         document.positionAt(0),
         document.positionAt(currentContent.length)
       );
-      edit.replace(this.documentUri, fullRange, this.pendingContent);
+      edit.replace(this.documentUri, fullRange, contentToWrite);
       const success = await vscode.workspace.applyEdit(edit);
 
       if (!success) {
@@ -122,11 +146,13 @@ export class SyncController implements vscode.Disposable {
     } catch (error) {
       vscode.window.showErrorMessage(`Error saving changes: ${error}`);
     } finally {
-      // Only reset flag if no newer update has started
-      if (this.updateVersion === thisUpdate) {
-        this.isUpdatingFromExtension = false;
+      this.isUpdatingFromExtension = false;
+      this.isApplying = false;
+
+      // If new content arrived while we were writing, apply it
+      if (this.pendingContent !== null) {
+        this.applyChanges();
       }
-      this.pendingContent = null;
     }
   }
 
