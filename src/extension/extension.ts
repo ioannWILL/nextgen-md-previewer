@@ -3,15 +3,15 @@ import { EditorManager } from './editorManager';
 
 let editorManager: EditorManager;
 
-// Track documents that already have preview opened to avoid duplicates
-const openedPreviews = new Set<string>();
+// Track documents that were open on activation (skip auto-open for these once)
+const initialDocuments = new Set<string>();
 
 export function activate(context: vscode.ExtensionContext) {
   editorManager = new EditorManager(context);
 
   // Record initially open editors to avoid auto-opening on reload
   vscode.window.visibleTextEditors.forEach((editor) => {
-    openedPreviews.add(editor.document.uri.toString());
+    initialDocuments.add(editor.document.uri.toString());
   });
 
   // Register the command to open the WYSIWYG preview
@@ -51,8 +51,9 @@ export function activate(context: vscode.ExtensionContext) {
     const document = editor.document;
     const uri = document.uri.toString();
 
-    // Skip if preview already opened for this document
-    if (openedPreviews.has(uri)) {
+    // Skip initially open documents (only once, then allow auto-open)
+    if (initialDocuments.has(uri)) {
+      initialDocuments.delete(uri);
       return;
     }
 
@@ -62,10 +63,8 @@ export function activate(context: vscode.ExtensionContext) {
       return;
     }
 
-    // Mark as opened to prevent duplicate previews
-    openedPreviews.add(uri);
-
     // Small delay to allow the editor to fully render
+    // EditorManager handles duplicate prevention (reveals existing panel)
     setTimeout(async () => {
       await editorManager.openPreview(document.uri);
     }, 150);
