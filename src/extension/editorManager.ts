@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { SyncController } from './syncController';
 
 export class EditorManager implements vscode.Disposable {
@@ -41,7 +42,7 @@ export class EditorManager implements vscode.Disposable {
     this.panels.set(key, panel);
 
     // Create sync controller
-    const syncController = new SyncController(document, panel, this.context);
+    const syncController = new SyncController(document, panel);
     this.syncControllers.set(key, syncController);
 
     // Set webview HTML content
@@ -56,15 +57,14 @@ export class EditorManager implements vscode.Disposable {
   }
 
   private getFileName(uri: vscode.Uri): string {
-    const parts = uri.fsPath.split('/');
-    return parts[parts.length - 1];
+    return path.basename(uri.fsPath);
   }
 
   private getDocumentDirectory(uri: vscode.Uri): string {
-    const parts = uri.fsPath.split('/');
-    parts.pop();
-    return parts.join('/');
+    return path.dirname(uri.fsPath);
   }
+
+  private static readonly NONCE_LENGTH = 32;
 
   private getWebviewContent(webview: vscode.Webview, initialContent: string): string {
     const scriptUri = webview.asWebviewUri(
@@ -73,9 +73,7 @@ export class EditorManager implements vscode.Disposable {
 
     const nonce = this.getNonce();
 
-    // Escape content for embedding in HTML
-    const escapedContent = this.escapeHtml(initialContent);
-
+    // JSON.stringify handles all necessary escaping for embedding in script
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,7 +181,7 @@ export class EditorManager implements vscode.Disposable {
 <body>
   <div id="editor"></div>
   <script nonce="${nonce}">
-    window.initialContent = ${JSON.stringify(escapedContent)};
+    window.initialContent = ${JSON.stringify(initialContent)};
     window.vscodeApi = acquireVsCodeApi();
   </script>
   <script nonce="${nonce}" src="${scriptUri}"></script>
@@ -194,19 +192,10 @@ export class EditorManager implements vscode.Disposable {
   private getNonce(): string {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < EditorManager.NONCE_LENGTH; i++) {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
-  }
-
-  private escapeHtml(text: string): string {
-    return text
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t');
   }
 
   dispose(): void {

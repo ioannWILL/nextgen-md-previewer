@@ -2,12 +2,14 @@ import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
+import { replaceAll } from '@milkdown/utils';
+import type { ExtensionToWebviewMessage, WebviewToExtensionMessage } from '../shared/types';
 
 declare global {
   interface Window {
     initialContent: string;
     vscodeApi: {
-      postMessage: (message: unknown) => void;
+      postMessage: (message: WebviewToExtensionMessage) => void;
       getState: () => unknown;
       setState: (state: unknown) => void;
     };
@@ -17,16 +19,17 @@ declare global {
 class WYSIWYGEditor {
   private editor: Editor | null = null;
   private isExternalUpdate = false;
+  private lastKnownContent = '';
 
   async initialize(): Promise<void> {
     const container = document.getElementById('editor');
     if (!container) {
-      console.error('Editor container not found');
       return;
     }
 
-    // Unescape the initial content
-    const initialContent = this.unescapeContent(window.initialContent);
+    // JSON.stringify on the extension side means initialContent is already properly parsed
+    const initialContent = window.initialContent;
+    this.lastKnownContent = initialContent;
 
     // Create the Milkdown editor
     this.editor = await Editor.make()
@@ -35,8 +38,9 @@ class WYSIWYGEditor {
         ctx.set(defaultValueCtx, initialContent);
 
         // Set up listener for content changes
-        ctx.get(listenerCtx).markdownUpdated((ctx, markdown) => {
+        ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
           if (!this.isExternalUpdate) {
+            this.lastKnownContent = markdown;
             this.onContentChanged(markdown);
           }
         });
@@ -51,21 +55,12 @@ class WYSIWYGEditor {
 
     // Listen for messages from extension
     window.addEventListener('message', (event) => {
-      const message = event.data;
+      const message = event.data as ExtensionToWebviewMessage;
       this.handleMessage(message);
     });
   }
 
-  private unescapeContent(content: string): string {
-    return content
-      .replace(/\\n/g, '\n')
-      .replace(/\\r/g, '\r')
-      .replace(/\\t/g, '\t')
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, '\\');
-  }
-
-  private handleMessage(message: { type: string; content?: string }): void {
+  private handleMessage(message: ExtensionToWebviewMessage): void {
     switch (message.type) {
       case 'contentUpdate':
         if (message.content !== undefined) {
@@ -78,13 +73,18 @@ class WYSIWYGEditor {
   private updateContent(markdown: string): void {
     if (!this.editor) return;
 
+    // Skip if content hasn't actually changed
+    if (markdown === this.lastKnownContent) return;
+
     this.isExternalUpdate = true;
+    this.lastKnownContent = markdown;
 
-    // TODO: Implement proper content update using Milkdown's API
-    // For now, this is a placeholder that will be enhanced in Phase 2
-    console.log('External content update received');
-
-    this.isExternalUpdate = false;
+    try {
+      // Use Milkdown's replaceAll action to update editor content
+      this.editor.action(replaceAll(markdown));
+    } finally {
+      this.isExternalUpdate = false;
+    }
   }
 
   private onContentChanged(markdown: string): void {

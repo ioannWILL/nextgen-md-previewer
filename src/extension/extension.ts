@@ -4,8 +4,6 @@ import { EditorManager } from './editorManager';
 let editorManager: EditorManager;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('NextGen .md Previewer is now active');
-
   editorManager = new EditorManager(context);
 
   // Register the command to open the WYSIWYG preview
@@ -20,8 +18,9 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      // Verify it's a markdown file
-      if (!targetUri.fsPath.endsWith('.md') && !targetUri.fsPath.endsWith('.markdown')) {
+      // Verify it's a markdown file (case-insensitive)
+      const lowerPath = targetUri.fsPath.toLowerCase();
+      if (!lowerPath.endsWith('.md') && !lowerPath.endsWith('.markdown')) {
         vscode.window.showErrorMessage('Selected file is not a markdown file');
         return;
       }

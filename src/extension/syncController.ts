@@ -1,22 +1,20 @@
 import * as vscode from 'vscode';
-
-interface WebviewMessage {
-  type: string;
-  content?: string;
-}
+import { WebviewToExtensionMessage } from '../shared/types';
 
 export class SyncController implements vscode.Disposable {
   private disposables: vscode.Disposable[] = [];
   private saveTimeout: NodeJS.Timeout | null = null;
   private pendingContent: string | null = null;
+  private updateVersion = 0;
   private isUpdatingFromExtension = false;
   private readonly debounceMs: number;
+  private readonly documentUri: vscode.Uri;
 
   constructor(
-    private document: vscode.TextDocument,
-    private panel: vscode.WebviewPanel,
-    private context: vscode.ExtensionContext
+    initialDocument: vscode.TextDocument,
+    private panel: vscode.WebviewPanel
   ) {
+    this.documentUri = initialDocument.uri;
     const config = vscode.workspace.getConfiguration('nextgenMdPreviewer');
     this.debounceMs = config.get('autoSaveDelay', 1000);
 
@@ -24,10 +22,16 @@ export class SyncController implements vscode.Disposable {
     this.setupDocumentWatcher();
   }
 
+  private getDocument(): vscode.TextDocument | undefined {
+    return vscode.workspace.textDocuments.find(
+      (d) => d.uri.toString() === this.documentUri.toString()
+    );
+  }
+
   private setupMessageHandling(): void {
     // Handle messages from webview
     this.panel.webview.onDidReceiveMessage(
-      async (message: WebviewMessage) => {
+      async (message: WebviewToExtensionMessage) => {
         switch (message.type) {
           case 'contentChanged':
             if (message.content !== undefined) {
@@ -48,7 +52,7 @@ export class SyncController implements vscode.Disposable {
   private setupDocumentWatcher(): void {
     // Watch for external changes to the document
     const changeDisposable = vscode.workspace.onDidChangeTextDocument((event) => {
-      if (event.document.uri.toString() === this.document.uri.toString()) {
+      if (event.document.uri.toString() === this.documentUri.toString()) {
         if (!this.isUpdatingFromExtension) {
           // External change (e.g., from source editor or undo)
           this.sendContentToWebview();
@@ -60,9 +64,15 @@ export class SyncController implements vscode.Disposable {
   }
 
   private sendContentToWebview(): void {
+    // Don't send if panel is not visible
+    if (!this.panel.visible) return;
+
+    const document = this.getDocument();
+    if (!document) return;
+
     this.panel.webview.postMessage({
       type: 'contentUpdate',
-      content: this.document.getText(),
+      content: document.getText(),
     });
   }
 
@@ -82,32 +92,54 @@ export class SyncController implements vscode.Disposable {
   private async applyChanges(): Promise<void> {
     if (this.pendingContent === null) return;
 
-    const currentContent = this.document.getText();
+    const document = this.getDocument();
+    if (!document) {
+      this.pendingContent = null;
+      return;
+    }
+
+    const currentContent = document.getText();
     if (currentContent === this.pendingContent) {
       this.pendingContent = null;
       return;
     }
 
+    const thisUpdate = ++this.updateVersion;
     this.isUpdatingFromExtension = true;
 
     try {
       const edit = new vscode.WorkspaceEdit();
       const fullRange = new vscode.Range(
-        this.document.positionAt(0),
-        this.document.positionAt(currentContent.length)
+        document.positionAt(0),
+        document.positionAt(currentContent.length)
       );
-      edit.replace(this.document.uri, fullRange, this.pendingContent);
-      await vscode.workspace.applyEdit(edit);
+      edit.replace(this.documentUri, fullRange, this.pendingContent);
+      const success = await vscode.workspace.applyEdit(edit);
+
+      if (!success) {
+        vscode.window.showErrorMessage('Failed to save changes to markdown file');
+      }
+    } catch (error) {
+      vscode.window.showErrorMessage(`Error saving changes: ${error}`);
     } finally {
-      this.isUpdatingFromExtension = false;
+      // Only reset flag if no newer update has started
+      if (this.updateVersion === thisUpdate) {
+        this.isUpdatingFromExtension = false;
+      }
       this.pendingContent = null;
     }
   }
 
-  dispose(): void {
+  async dispose(): Promise<void> {
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
+
+    // Flush any pending changes before disposal to prevent data loss
+    if (this.pendingContent !== null) {
+      await this.applyChanges();
+    }
+
     this.disposables.forEach((d) => d.dispose());
   }
 }
