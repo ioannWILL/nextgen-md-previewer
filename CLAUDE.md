@@ -14,9 +14,9 @@ npm test             # Run tests with Vitest
 ## Testing the Extension
 
 1. Open the project in VS Code
-2. Run → Start Debugging (or use Command Palette: "Debug: Start Debugging")
+2. Run → Start Debugging (F5)
 3. In the Extension Development Host window, open any `.md` file
-4. Right-click on the file tab → "NextGen Preview"
+4. Right-click on the file tab → "Preview with NextGen .md Previewer"
 
 ## Architecture
 
@@ -55,12 +55,23 @@ Activated via `editor/title/context` menu on markdown files. The command `nextge
 
 ## Key Dependencies
 
-- **Milkdown** (`@milkdown/core`, `preset-commonmark`, `preset-gfm`) - WYSIWYG markdown editor
+- **Milkdown** - WYSIWYG markdown editor
+  - `@milkdown/core` - Editor core
+  - `@milkdown/ctx` - Context/dependency injection
+  - `@milkdown/preset-commonmark` - Standard markdown
+  - `@milkdown/preset-gfm` - GitHub Flavored Markdown
+  - `@milkdown/plugin-listener` - Content change events
 - **esbuild** - Bundler for both extension and webview code
 
 ## Planned Features (Not Yet Implemented)
 
-- Math equations (KaTeX) - `@milkdown/plugin-math` is deprecated, needs alternative
-- Mermaid diagrams - `@milkdown/plugin-diagram` is deprecated, needs alternative
+- Math equations (KaTeX) - `@milkdown/plugin-math` is deprecated in v7, needs custom integration
+- Mermaid diagrams - `@milkdown/plugin-diagram` is deprecated in v7, needs custom integration
 - Syntax highlighting for code blocks (Prism.js)
 - Floating toolbar
+- Image drag-and-drop handler
+
+## Related Files
+
+- **CTO-PROJECT.md** - Comprehensive project documentation for AI assistants (vision, architecture, rules)
+- **README.md** - User-facing documentation

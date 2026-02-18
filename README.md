@@ -2,17 +2,23 @@
 
 A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without switching to raw mode.
 
+[![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://code.visualstudio.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Features
 
 - **True WYSIWYG editing**: Click directly on rendered markdown and start typing
 - **Auto-save**: Changes sync automatically to your markdown file
 - **Non-intrusive**: Opens via context menu, doesn't replace default editor
-- **Extended markdown support** (coming soon):
-  - Tables (GFM)
-  - Task lists
-  - Math equations (KaTeX)
-  - Mermaid diagrams
-  - Syntax-highlighted code blocks
+- **GFM support**: Tables, task lists, strikethrough (GitHub Flavored Markdown)
+- **Theme integration**: Matches your VS Code color theme
+
+### Coming Soon
+- Math equations (KaTeX)
+- Mermaid diagrams
+- Syntax-highlighted code blocks
+- Floating formatting toolbar
+- Image drag-and-drop
 
 ## Usage
 
@@ -21,16 +27,20 @@ A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without s
 3. Select **"Preview with NextGen .md Previewer"**
 4. Edit directly in the WYSIWYG preview
 
+## Requirements
+
+- VS Code 1.85.0 or higher
+
 ## Configuration
 
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `nextgenMdPreviewer.autoSaveDelay` | `1000` | Delay (ms) before auto-saving changes |
-| `nextgenMdPreviewer.toolbar.visible` | `true` | Show formatting toolbar |
-| `nextgenMdPreviewer.toolbar.position` | `"floating"` | Toolbar position: `"top"` or `"floating"` |
-| `nextgenMdPreviewer.features.math` | `true` | Enable LaTeX math rendering |
-| `nextgenMdPreviewer.features.mermaid` | `true` | Enable Mermaid diagram rendering |
-| `nextgenMdPreviewer.images.folder` | `"assets"` | Folder for uploaded images |
+| `nextgenMdPreviewer.toolbar.visible` | `true` | Show formatting toolbar *(coming soon)* |
+| `nextgenMdPreviewer.toolbar.position` | `"floating"` | Toolbar position: `"top"` or `"floating"` *(coming soon)* |
+| `nextgenMdPreviewer.features.math` | `true` | Enable LaTeX math rendering *(coming soon)* |
+| `nextgenMdPreviewer.features.mermaid` | `true` | Enable Mermaid diagram rendering *(coming soon)* |
+| `nextgenMdPreviewer.images.folder` | `"assets"` | Folder for uploaded images *(coming soon)* |
 
 ## Development
 
@@ -47,6 +57,16 @@ npm run watch
 # Run tests
 npm test
 ```
+
+## Known Limitations
+
+- Math equations and Mermaid diagrams are not yet supported (Milkdown v7 deprecated plugins)
+- Code blocks display without syntax highlighting
+- Floating toolbar not yet implemented
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
