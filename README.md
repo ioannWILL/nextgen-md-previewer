@@ -9,16 +9,13 @@ A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without s
 
 - **True WYSIWYG editing**: Click directly on rendered markdown and start typing
 - **Auto-save**: Changes sync automatically to your markdown file
-- **Non-intrusive**: Opens via context menu, doesn't replace default editor
+- **Formatting toolbar**: Bold, italic, strikethrough, code, links, headings, blockquotes
+- **Keyboard shortcuts**: Standard formatting shortcuts (Ctrl+B, Ctrl+I, etc.)
+- **Syntax highlighting**: Code blocks with Prism.js (20+ languages)
+- **Math equations**: LaTeX math with KaTeX ($...$ and $$...$$)
 - **GFM support**: Tables, task lists, strikethrough (GitHub Flavored Markdown)
 - **Theme integration**: Matches your VS Code color theme
-
-### Coming Soon
-- Math equations (KaTeX)
-- Mermaid diagrams
-- Syntax-highlighted code blocks
-- Floating formatting toolbar
-- Image drag-and-drop
+- **Undo/Redo**: Full history support
 
 ## Usage
 
@@ -27,9 +24,15 @@ A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without s
 3. Select **"Preview with NextGen .md Previewer"**
 4. Edit directly in the WYSIWYG preview
 
-## Requirements
+## Keyboard Shortcuts
 
-- VS Code 1.85.0 or higher
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+B` / `Cmd+B` | Bold |
+| `Ctrl+I` / `Cmd+I` | Italic |
+| `Ctrl+K` / `Cmd+K` | Insert/Remove Link |
+| `Ctrl+Shift+S` / `Cmd+Shift+S` | Strikethrough |
+| `Ctrl+Shift+C` / `Cmd+Shift+C` | Code Block |
 
 ## Configuration
 
@@ -37,12 +40,22 @@ A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without s
 |---------|---------|-------------|
 | `nextgenMdPreviewer.autoSaveDelay` | `1000` | Delay (ms) before auto-saving changes |
 | `nextgenMdPreviewer.previewLocation` | `"sameTab"` | Where to open preview: `"sameTab"` or `"sideBySide"` |
-| `nextgenMdPreviewer.autoOpen` | `false` | Automatically open preview when a markdown file is opened |
-| `nextgenMdPreviewer.toolbar.visible` | `true` | Show formatting toolbar *(coming soon)* |
-| `nextgenMdPreviewer.toolbar.position` | `"floating"` | Toolbar position: `"top"` or `"floating"` *(coming soon)* |
-| `nextgenMdPreviewer.features.math` | `true` | Enable LaTeX math rendering *(coming soon)* |
-| `nextgenMdPreviewer.features.mermaid` | `true` | Enable Mermaid diagram rendering *(coming soon)* |
-| `nextgenMdPreviewer.images.folder` | `"assets"` | Folder for uploaded images *(coming soon)* |
+| `nextgenMdPreviewer.autoOpen` | `false` | Automatically open preview when opening markdown files |
+| `nextgenMdPreviewer.toolbar.visible` | `true` | Show formatting toolbar |
+
+## Supported Languages (Syntax Highlighting)
+
+JavaScript, TypeScript, JSX, TSX, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP, Swift, Kotlin, SQL, Bash, YAML, JSON, CSS, Markdown, Docker, Diff
+
+## Requirements
+
+- VS Code 1.85.0 or higher
+
+## Known Limitations
+
+- Mermaid diagrams not yet supported (requires custom plugin development)
+- KaTeX fonts may not render perfectly in all themes
+- Image drag-and-drop not yet implemented
 
 ## Development
 
@@ -59,12 +72,6 @@ npm run watch
 # Run tests
 npm test
 ```
-
-## Known Limitations
-
-- Math equations and Mermaid diagrams are not yet supported (Milkdown v7 deprecated plugins)
-- Code blocks display without syntax highlighting
-- Floating toolbar not yet implemented
 
 ## Contributing
 
