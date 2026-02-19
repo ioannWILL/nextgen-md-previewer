@@ -48,6 +48,7 @@ declare global {
   interface Window {
     initialContent: string;
     toolbarVisible: boolean;
+    imageBaseUri: string;
     vscodeApi: {
       postMessage: (message: WebviewToExtensionMessage) => void;
       getState: () => unknown;
@@ -109,6 +110,9 @@ class WYSIWYGEditor {
       this.toolbar = new Toolbar(this.editor);
     }
 
+    // Set up image path transformation
+    this.setupImagePathTransformation(container);
+
     // Notify extension that editor is ready
     window.vscodeApi.postMessage({ type: 'ready' });
 
@@ -150,6 +154,62 @@ class WYSIWYGEditor {
     window.vscodeApi.postMessage({
       type: 'contentChanged',
       content: markdown,
+    });
+  }
+
+  private setupImagePathTransformation(container: HTMLElement): void {
+    const baseUri = window.imageBaseUri;
+    if (!baseUri) return;
+
+    // Transform a single image element
+    const transformImage = (img: HTMLImageElement) => {
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      // Skip already transformed URLs (webview URIs, data URIs, absolute URLs)
+      if (src.startsWith('vscode-webview://') ||
+          src.startsWith('data:') ||
+          src.startsWith('http://') ||
+          src.startsWith('https://')) {
+        return;
+      }
+
+      // Transform relative path to webview URI
+      // Remove leading ./ if present
+      const cleanPath = src.startsWith('./') ? src.slice(2) : src;
+      const newSrc = `${baseUri}/${cleanPath}`;
+      img.setAttribute('src', newSrc);
+    };
+
+    // Transform existing images
+    container.querySelectorAll('img').forEach(img => transformImage(img as HTMLImageElement));
+
+    // Watch for new images with MutationObserver
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        // Check added nodes for images
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLImageElement) {
+            transformImage(node);
+          } else if (node instanceof HTMLElement) {
+            node.querySelectorAll('img').forEach(img => transformImage(img as HTMLImageElement));
+          }
+        });
+
+        // Check attribute changes on images
+        if (mutation.type === 'attributes' &&
+            mutation.attributeName === 'src' &&
+            mutation.target instanceof HTMLImageElement) {
+          transformImage(mutation.target);
+        }
+      });
+    });
+
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['src'],
     });
   }
 }

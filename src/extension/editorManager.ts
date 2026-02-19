@@ -66,7 +66,7 @@ export class EditorManager implements vscode.Disposable {
     this.syncControllers.set(key, syncController);
 
     // Set webview HTML content
-    panel.webview.html = this.getWebviewContent(panel.webview, document.getText());
+    panel.webview.html = this.getWebviewContent(panel.webview, document.getText(), uri);
 
     // Handle panel disposal - await sync controller flush
     panel.onDidDispose(async () => {
@@ -91,10 +91,14 @@ export class EditorManager implements vscode.Disposable {
 
   private static readonly NONCE_LENGTH = 32;
 
-  private getWebviewContent(webview: vscode.Webview, initialContent: string): string {
+  private getWebviewContent(webview: vscode.Webview, initialContent: string, documentUri: vscode.Uri): string {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview', 'index.js')
     );
+
+    // Calculate base URI for images relative to the document
+    const documentDir = vscode.Uri.file(this.getDocumentDirectory(documentUri));
+    const imageBaseUri = webview.asWebviewUri(documentDir).toString();
 
     const nonce = this.getNonce();
     const config = this.getConfig();
@@ -568,6 +572,7 @@ export class EditorManager implements vscode.Disposable {
   <script nonce="${nonce}">
     window.initialContent = ${JSON.stringify(initialContent)};
     window.toolbarVisible = ${JSON.stringify(toolbarVisible)};
+    window.imageBaseUri = ${JSON.stringify(imageBaseUri)};
     window.vscodeApi = acquireVsCodeApi();
   </script>
   <script nonce="${nonce}" src="${scriptUri}"></script>
