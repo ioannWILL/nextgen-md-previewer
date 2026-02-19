@@ -106,6 +106,7 @@
     "@eslint/js": "^9.x",
     "@types/node": "^20.x",
     "@types/vscode": "^1.85.0",
+    "@vitest/coverage-v8": "^1.6.0",
     "esbuild": "^0.20.x",
     "eslint": "^9.x",
     "typescript": "^5.x",
