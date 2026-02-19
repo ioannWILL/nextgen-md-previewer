@@ -56,7 +56,10 @@
         },
         "nextgenMdPreviewer.previewLocation": {
           "type": "string",
-          "enum": ["sameTab", "sideBySide"],
+          "enum": [
+            "sameTab",
+            "sideBySide"
+          ],
           "default": "sameTab",
           "enumDescriptions": [
             "Open preview in a new tab in the same editor group",
@@ -73,12 +76,6 @@
           "type": "boolean",
           "default": true,
           "description": "Show the formatting toolbar"
-        },
-        "nextgenMdPreviewer.toolbar.position": {
-          "type": "string",
-          "enum": ["top", "floating"],
-          "default": "floating",
-          "description": "Toolbar position: fixed at top or floating on selection"
         },
         "nextgenMdPreviewer.features.math": {
           "type": "boolean",
@@ -118,11 +115,12 @@
   "dependencies": {
     "@milkdown/core": "^7.x",
     "@milkdown/ctx": "^7.x",
-    "@milkdown/preset-commonmark": "^7.x",
-    "@milkdown/preset-gfm": "^7.x",
+    "@milkdown/plugin-diagram": "^7.x",
+    "@milkdown/plugin-history": "^7.18.0",
     "@milkdown/plugin-listener": "^7.x",
     "@milkdown/plugin-math": "^7.x",
-    "@milkdown/plugin-diagram": "^7.x",
+    "@milkdown/preset-commonmark": "^7.x",
+    "@milkdown/preset-gfm": "^7.x",
     "katex": "^0.16.x",
     "mermaid": "^10.x",
     "prismjs": "^1.29.x"

@@ -2,12 +2,15 @@ import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
+import { history } from '@milkdown/plugin-history';
 import { replaceAll } from '@milkdown/utils';
 import type { ExtensionToWebviewMessage, WebviewToExtensionMessage } from '../shared/types';
+import { Toolbar } from './toolbar';
 
 declare global {
   interface Window {
     initialContent: string;
+    toolbarVisible: boolean;
     vscodeApi: {
       postMessage: (message: WebviewToExtensionMessage) => void;
       getState: () => unknown;
@@ -18,6 +21,7 @@ declare global {
 
 class WYSIWYGEditor {
   private editor: Editor | null = null;
+  private toolbar: Toolbar | null = null;
   private isExternalUpdate = false;
   private lastKnownContent = '';
 
@@ -47,8 +51,15 @@ class WYSIWYGEditor {
       })
       .use(commonmark)
       .use(gfm)
+      .use(history)
       .use(listener)
       .create();
+
+    // Initialize toolbar if visible
+    const toolbarVisible = window.toolbarVisible !== false;
+    if (toolbarVisible) {
+      this.toolbar = new Toolbar(this.editor);
+    }
 
     // Notify extension that editor is ready
     window.vscodeApi.postMessage({ type: 'ready' });
