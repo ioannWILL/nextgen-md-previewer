@@ -4,7 +4,17 @@ import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
 import { history } from '@milkdown/plugin-history';
 import { prism, prismConfig } from '@milkdown/plugin-prism';
+import { math, mathBlockSchema } from '@milkdown/plugin-math';
+import { diagram, diagramSchema } from '@milkdown/plugin-diagram';
 import { replaceAll } from '@milkdown/utils';
+
+// Import KaTeX CSS as text and inject it
+import katexCSS from 'katex/dist/katex.min.css';
+
+// Inject KaTeX CSS into the document
+const katexStyle = document.createElement('style');
+katexStyle.textContent = katexCSS;
+document.head.appendChild(katexStyle);
 
 // Import Prism core and languages
 import Prism from 'prismjs';
@@ -88,6 +98,8 @@ class WYSIWYGEditor {
       .use(gfm)
       .use(history)
       .use(prism)
+      .use(math)
+      .use(diagram)
       .use(listener)
       .create();
 

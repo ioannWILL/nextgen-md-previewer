@@ -213,6 +213,33 @@ export class EditorManager implements vscode.Disposable {
       border-radius: 3px;
       font-size: 0.9em;
     }
+    /* Math blocks (KaTeX) */
+    .math-inline,
+    .math-display {
+      color: var(--vscode-editor-foreground);
+    }
+    .math-display {
+      display: block;
+      text-align: center;
+      margin: 16px 0;
+      padding: 12px;
+      background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.05));
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    /* Mermaid diagrams */
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 16px 0;
+      padding: 16px;
+      background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.05));
+      border-radius: 4px;
+    }
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
     /* Tables */
     table {
       border-collapse: collapse;
