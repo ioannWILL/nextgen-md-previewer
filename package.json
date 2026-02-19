@@ -1,28 +1,45 @@
 {
   "name": "nextgen-md-previewer",
   "displayName": "NextGen .md Previewer",
-  "description": "A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly without switching to raw mode.",
-  "version": "0.3.0",
+  "description": "A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly with formatting toolbar, syntax highlighting, and math equations.",
+  "version": "0.4.0",
   "publisher": "IvanVilchavskyi",
   "license": "MIT",
   "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ioannWILL/nextgen-md-previewer.git"
   },
+  "bugs": {
+    "url": "https://github.com/ioannWILL/nextgen-md-previewer/issues"
+  },
+  "homepage": "https://github.com/ioannWILL/nextgen-md-previewer#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other",
-    "Visualization"
+    "Visualization",
+    "Formatters"
   ],
   "keywords": [
     "markdown",
     "wysiwyg",
     "preview",
     "editor",
-    "md"
+    "md",
+    "rich text",
+    "formatting",
+    "latex",
+    "katex",
+    "math",
+    "gfm",
+    "github flavored markdown",
+    "syntax highlighting"
   ],
   "activationEvents": [
     "onLanguage:markdown"

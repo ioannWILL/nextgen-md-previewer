@@ -10,13 +10,16 @@ This is ***bold and italic*** together.
 
 This is ~~strikethrough~~ text.
 
-This is `inline code` within a sentence.
+This is `inline code` within a sentence. new text
 
 ## Headings
 
 ### Heading 3
+
 #### Heading 4
+
 ##### Heading 5
+
 ###### Heading 6
 
 ## Links and Images
@@ -30,23 +33,33 @@ This is `inline code` within a sentence.
 ## Lists
 
 ### Unordered List
-- Item 1
-- Item 2
-  - Nested item 2.1
-  - Nested item 2.2
-- Item 3
+
+* Item 1
+
+* Item 2
+
+  * Nested item 2.1
+
+  * Nested item 2.2
+
+* Item 3
 
 ### Ordered List
+
 1. First item
 2. Second item
+
    1. Nested item 2.1
    2. Nested item 2.2
 3. Third item
 
 ### Task List
-- [x] Completed task
-- [ ] Incomplete task
-- [ ] Another task to do
+
+* [x] Completed task
+
+* [ ] Incomplete task
+
+* [ ] Another task to do
 
 ## Blockquotes
 
@@ -79,16 +92,16 @@ def hello(name):
 
 ## Tables
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Bold | Working | Basic formatting |
-| Italic | Working | Basic formatting |
-| Tables | Testing | GFM extension |
-| Math | Planned | KaTeX integration |
+| Feature | Status  | Notes             |
+| ------- | ------- | ----------------- |
+| Bold    | Working | Basic formatting  |
+| Italic  | Working | Basic formatting  |
+| Tables  | Testing | GFM extension     |
+| Math    | Planned | KaTeX integration |
 
 ## Horizontal Rule
 
----
+***
 
 ## Math Equations (Future)
 
@@ -96,7 +109,7 @@ Inline math: $E = mc^2$
 
 Block math:
 $$
-\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+\int\_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
 $$
 
 ## Mermaid Diagrams (Future)
@@ -111,15 +124,18 @@ graph TD
 
 ## Special Characters
 
-- Ampersand: &
-- Less than: <
-- Greater than: >
-- Quotes: "double" and 'single'
+* Ampersand: &
+
+* Less than: <
+
+* Greater than: >
+
+* Quotes: "double" and 'single'
 
 ## Long Paragraph
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 
----
+***
 
 *End of test file*

@@ -2,6 +2,21 @@
 
 All notable changes to the NextGen .md Previewer extension will be documented in this file.
 
+## [0.4.0] - 2026-02-19
+
+### Added
+- Unit tests for SyncController (95% coverage)
+- Type validation tests for message types
+- Vitest configuration with coverage reporting
+
+### Changed
+- Updated marketplace metadata (better description, more keywords)
+- Improved documentation in README
+
+### Fixed
+- Removed conflicting Ctrl+` keyboard shortcut
+- Removed unstable mermaid diagram rendering (caused infinite loops)
+
 ## [0.3.0] - 2026-02-19
 
 ### Added
