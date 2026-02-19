@@ -278,7 +278,13 @@ export class EditorManager implements vscode.Disposable {
       text-decoration: line-through;
     }
 
-    .toolbar-button#toolbar-code {
+    .toolbar-button#toolbar-inlineCode {
+      font-family: var(--vscode-editor-font-family, monospace);
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .toolbar-button#toolbar-codeBlock {
       font-family: var(--vscode-editor-font-family, monospace);
       font-size: 11px;
     }

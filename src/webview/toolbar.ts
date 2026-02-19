@@ -3,6 +3,7 @@ import { callCommand } from '@milkdown/utils';
 import {
   toggleStrongCommand,
   toggleEmphasisCommand,
+  toggleInlineCodeCommand,
   wrapInBlockquoteCommand,
   turnIntoTextCommand,
   createCodeBlockCommand,
@@ -37,6 +38,7 @@ export class Toolbar {
     this.editor = editor;
     this.createToolbar();
     this.setupActiveStateListener();
+    this.setupKeyboardShortcuts();
   }
 
   private createToolbar(): void {
@@ -91,10 +93,17 @@ export class Toolbar {
         action: () => this.toggleStrikethrough(),
       },
       {
-        id: 'code',
+        id: 'inlineCode',
+        icon: '`',
+        title: 'Inline Code',
+        shortcut: 'Ctrl+`',
+        action: () => this.toggleInlineCode(),
+      },
+      {
+        id: 'codeBlock',
         icon: '{ }',
         title: 'Code Block',
-        shortcut: 'Ctrl+`',
+        shortcut: 'Ctrl+Shift+C',
         action: () => this.toggleCodeBlock(),
         isTextIcon: true,
       },
@@ -269,6 +278,57 @@ export class Toolbar {
     setTimeout(() => this.updateActiveStates(), 100);
   }
 
+  private setupKeyboardShortcuts(): void {
+    document.addEventListener('keydown', (e) => {
+      // Check for Ctrl (or Cmd on Mac)
+      const isMod = e.ctrlKey || e.metaKey;
+
+      if (!isMod) return;
+
+      // Ctrl+B - Bold
+      if (e.key === 'b' && !e.shiftKey) {
+        e.preventDefault();
+        this.toggleBold();
+        return;
+      }
+
+      // Ctrl+I - Italic
+      if (e.key === 'i' && !e.shiftKey) {
+        e.preventDefault();
+        this.toggleItalic();
+        return;
+      }
+
+      // Ctrl+K - Link
+      if (e.key === 'k' && !e.shiftKey) {
+        e.preventDefault();
+        this.toggleLink();
+        return;
+      }
+
+      // Ctrl+Shift+S - Strikethrough
+      if (e.key === 'S' && e.shiftKey) {
+        e.preventDefault();
+        this.toggleStrikethrough();
+        return;
+      }
+
+      // Ctrl+` - Inline Code
+      if (e.key === '`' && !e.shiftKey) {
+        e.preventDefault();
+        this.toggleInlineCode();
+        return;
+      }
+
+      // Ctrl+Shift+C - Code Block
+      if (e.key === 'C' && e.shiftKey) {
+        e.preventDefault();
+        this.toggleCodeBlock();
+        return;
+      }
+    });
+  }
+
   private updateActiveStates(): void {
     try {
       this.editor.action((ctx) => {
@@ -289,23 +349,27 @@ export class Toolbar {
         let hasItalic = false;
         let hasStrikethrough = false;
         let hasLink = false;
+        let hasInlineCode = false;
 
         if (empty) {
           // No selection - only highlight link if cursor is on a link
           const marks = $from.marks();
           hasLink = marks.some(m => m.type.name === 'link');
+          hasInlineCode = marks.some(m => m.type.name === 'inlineCode');
         } else {
           // Has selection - check if ALL text in selection has the mark
           hasBold = this.isMarkActiveInRange(state, from, to, 'strong');
           hasItalic = this.isMarkActiveInRange(state, from, to, 'emphasis');
           hasStrikethrough = this.isMarkActiveInRange(state, from, to, 'strike_through');
           hasLink = this.isMarkActiveInRange(state, from, to, 'link');
+          hasInlineCode = this.isMarkActiveInRange(state, from, to, 'inlineCode');
         }
 
         this.setButtonActive('bold', hasBold);
         this.setButtonActive('italic', hasItalic);
         this.setButtonActive('strikethrough', hasStrikethrough);
         this.setButtonActive('link', hasLink);
+        this.setButtonActive('inlineCode', hasInlineCode);
 
         // === BLOCK-LEVEL FORMATTING (heading, blockquote, code block) ===
         // Always show based on cursor position
@@ -332,7 +396,7 @@ export class Toolbar {
           depth--;
         }
 
-        this.setButtonActive('code', isInCodeBlock);
+        this.setButtonActive('codeBlock', isInCodeBlock);
 
         // Update heading button
         const headingButton = this.buttons.get('heading');
@@ -420,6 +484,11 @@ export class Toolbar {
 
   private toggleStrikethrough(): void {
     this.editor.action(callCommand(toggleStrikethroughCommand.key));
+    setTimeout(() => this.updateActiveStates(), 10);
+  }
+
+  private toggleInlineCode(): void {
+    this.editor.action(callCommand(toggleInlineCodeCommand.key));
     setTimeout(() => this.updateActiveStates(), 10);
   }
 
