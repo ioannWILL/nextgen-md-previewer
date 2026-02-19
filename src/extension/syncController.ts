@@ -6,6 +6,7 @@ export class SyncController implements vscode.Disposable {
   private saveTimeout: NodeJS.Timeout | null = null;
   private pendingContent: string | null = null;
   private isApplying = false;
+  private isDisposed = false;
   private isUpdatingFromExtension = false;
   private needsResyncOnVisible = false;
   private readonly debounceMs: number;
@@ -107,8 +108,8 @@ export class SyncController implements vscode.Disposable {
   }
 
   private async applyChanges(): Promise<void> {
-    // Prevent concurrent applies
-    if (this.isApplying) return;
+    // Prevent concurrent applies or applying after disposal
+    if (this.isDisposed || this.isApplying) return;
     if (this.pendingContent === null) return;
 
     // Capture the content to write and clear pending immediately
@@ -157,13 +158,20 @@ export class SyncController implements vscode.Disposable {
   }
 
   async dispose(): Promise<void> {
+    // Guard against double disposal
+    if (this.isDisposed) return;
+    this.isDisposed = true;
+
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
 
     // Flush any pending changes before disposal to prevent data loss
+    // Temporarily unset isDisposed to allow final flush
     if (this.pendingContent !== null) {
+      this.isDisposed = false;
       await this.applyChanges();
+      this.isDisposed = true;
     }
 
     this.disposables.forEach((d) => d.dispose());

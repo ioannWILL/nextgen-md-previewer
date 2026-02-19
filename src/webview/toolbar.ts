@@ -743,9 +743,19 @@ export class Toolbar {
         // Lift content out of blockquote using ProseMirror's lift
         const range = $from.blockRange();
         if (range) {
-          const target = range.depth >= 1 ? range.depth - 1 : 0;
-          const tr = state.tr.lift(range, target);
-          dispatch(tr);
+          // Find valid lift target - this handles nested structures correctly
+          let target: number | null = null;
+          for (let d = range.depth; d >= 0; d--) {
+            const node = range.$from.node(d);
+            if (node.type.name === 'blockquote') {
+              target = d > 0 ? d - 1 : 0;
+              break;
+            }
+          }
+          if (target !== null) {
+            const tr = state.tr.lift(range, target);
+            dispatch(tr);
+          }
         }
       } else {
         // Wrap in blockquote

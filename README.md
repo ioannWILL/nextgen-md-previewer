@@ -53,9 +53,10 @@ JavaScript, TypeScript, JSX, TSX, Python, Java, C, C++, C#, Go, Rust, Ruby, PHP,
 
 ## Known Limitations
 
-- Mermaid diagrams not yet supported (requires custom plugin development)
-- KaTeX fonts may not render perfectly in all themes
+- Mermaid diagrams not supported (requires custom plugin development)
+- KaTeX fonts may use fallback fonts in some themes (CSP limitation)
 - Image drag-and-drop not yet implemented
+- Very large files (>100KB) may experience typing lag
 
 ## Development
 

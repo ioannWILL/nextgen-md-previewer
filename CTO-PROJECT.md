@@ -41,8 +41,8 @@ NextGen .md Previewer is a VS Code extension that enables seamless WYSIWYG editi
 2. **Non-intrusive integration** - Opens via context menu, doesn't replace VS Code's default markdown editor
 3. **Auto-save** - Changes sync automatically to the source markdown file with configurable delay
 4. **GFM support** - Tables, task lists, strikethrough (GitHub Flavored Markdown)
-5. **Extended markdown** *(planned)* - Math equations (KaTeX), Mermaid diagrams, syntax-highlighted code blocks
-6. **Floating toolbar** *(planned)* - Format text with toolbar appearing on selection
+5. **Extended markdown** - Math equations (KaTeX), syntax-highlighted code blocks (Prism.js, 20+ languages)
+6. **Fixed toolbar** - Format text with toolbar at top of editor (bold, italic, strikethrough, code, links, headings, blockquotes)
 7. **VS Code theme integration** - Editor matches the active VS Code theme (basic CSS variables)
 8. **Image handling** *(planned)* - Drag-and-drop image upload to configurable assets folder
 
@@ -73,16 +73,17 @@ NextGen .md Previewer is a VS Code extension that enables seamless WYSIWYG editi
 | `@milkdown/preset-commonmark` | Standard markdown syntax | In use |
 | `@milkdown/preset-gfm` | GitHub Flavored Markdown | In use |
 | `@milkdown/plugin-listener` | Content change event handling | In use |
-| `@milkdown/plugin-math` | Math equations (deprecated in v7) | Not working |
-| `@milkdown/plugin-diagram` | Mermaid diagrams (deprecated in v7) | Not working |
-| `katex` | LaTeX math rendering | Planned |
-| `mermaid` | Diagram rendering | Planned |
-| `prismjs` | Code syntax highlighting | Planned |
+| `@milkdown/plugin-history` | Undo/redo support | In use |
+| `@milkdown/plugin-prism` | Syntax highlighting integration | In use |
+| `@milkdown/plugin-math` | Math equations | In use |
+| `katex` | LaTeX math rendering | In use |
+| `prismjs` | Code syntax highlighting | In use |
+| `mermaid` | Diagram rendering | Removed (DOM conflicts) |
 
 ### Infrastructure
 - **VS Code Engine:** `^1.85.0` (minimum supported version)
-- **Distribution:** VS Code Marketplace
-- **CI/CD:** TBD - configure GitHub Actions for automated publishing
+- **Distribution:** VS Code Marketplace + Open VSX (Cursor)
+- **CI/CD:** Manual publishing via `vsce publish` and `ovsx publish`
 
 ---
 
@@ -134,7 +135,8 @@ nextgen-md-previewer/
 │   │   ├── editorManager.ts    # Creates/manages WebviewPanels
 │   │   └── syncController.ts   # Document ↔ Webview sync
 │   ├── webview/                # Browser (webview)
-│   │   └── index.ts            # Milkdown setup
+│   │   ├── index.ts            # Milkdown setup, message handling
+│   │   └── toolbar.ts          # Formatting toolbar component
 │   └── shared/                 # Shared types
 │       └── types.ts
 ├── dist/                       # Build output (git-ignored)
@@ -230,7 +232,6 @@ npm run vscode:prepublish    # Production build
 | `nextgenMdPreviewer.previewLocation` | `"sameTab"` | Where to open preview: `"sameTab"` or `"sideBySide"` |
 | `nextgenMdPreviewer.autoOpen` | `false` | Automatically open preview when a markdown file is opened |
 | `nextgenMdPreviewer.toolbar.visible` | `true` | Show formatting toolbar |
-| `nextgenMdPreviewer.toolbar.position` | `"floating"` | Toolbar position: `"top"` or `"floating"` |
 | `nextgenMdPreviewer.features.math` | `true` | Enable LaTeX math rendering |
 | `nextgenMdPreviewer.features.mermaid` | `true` | Enable Mermaid diagram rendering |
 | `nextgenMdPreviewer.images.folder` | `"assets"` | Folder for uploaded images |
@@ -243,19 +244,22 @@ npm run vscode:prepublish    # Production build
 - [x] Project setup with TypeScript and esbuild
 - [x] Extension manifest with context menu contribution
 - [x] EditorManager for WebviewPanel creation
-- [x] SyncController with debounced auto-save
-- [x] Basic Milkdown editor with CommonMark + GFM
+- [x] SyncController with debounced auto-save and disposal guards
+- [x] Milkdown editor with CommonMark + GFM + History + Prism + Math
+- [x] Fixed toolbar with formatting buttons and keyboard shortcuts
+- [x] Math equations (KaTeX) - inline and block
+- [x] Prism.js code highlighting (20+ languages)
+- [x] VS Code theme synchronization via CSS variables
+- [x] Unit tests for SyncController (95% coverage)
+- [x] Image path resolution for local images
+- [x] Published to VS Code Marketplace and Open VSX
 
-### In Progress / Planned
-- [ ] Floating toolbar component
-- [ ] Math equations (KaTeX) - need alternative to deprecated plugin
-- [ ] Mermaid diagrams - need alternative to deprecated plugin
-- [ ] Prism.js code highlighting
+### Not Implemented / Deferred
+- [ ] Mermaid diagrams - removed due to DOM conflicts (needs custom Milkdown plugin)
+- [ ] Floating toolbar (current toolbar is fixed at top)
 - [ ] Image drag-and-drop handler
-- [ ] VS Code theme synchronization
-- [ ] Unit tests
-- [ ] Marketplace assets (icon, demo GIF)
-- [ ] Publishing to VS Code Marketplace
+- [ ] Footnotes support (no Milkdown plugin available)
+- [ ] Demo GIF and screenshots for marketplace
 
 ---
 
@@ -263,9 +267,11 @@ npm run vscode:prepublish    # Production build
 
 | Issue | Impact | Workaround / Plan |
 |-------|--------|-------------------|
-| `@milkdown/plugin-math` deprecated in v7.x | Math equations don't render | Build custom KaTeX integration or find alternative |
-| `@milkdown/plugin-diagram` deprecated in v7.x | Mermaid diagrams don't render | Build custom Mermaid integration or find alternative |
-| No syntax highlighting in code blocks | Code blocks render as plain text | Integrate Prism.js manually |
+| Mermaid diagrams not supported | Diagrams show as code blocks | Needs custom Milkdown plugin; deferred |
+| Toolbar event listeners not cleaned up on destroy | Memory leak with many open/close cycles | Store bound handlers and remove in destroy() |
+| Large document performance (>100KB) | Typing lag on very large files | Full document replacement; consider diff-based sync |
+| Link dialog stale selection | Link may target wrong range if doc changes while dialog open | Re-capture selection on submit |
+| KaTeX fonts may use fallbacks | Math may not render with optimal fonts | CSP limitation in webviews |
 
 ---
 
@@ -274,4 +280,6 @@ npm run vscode:prepublish    # Production build
 - Extension activates on `onLanguage:markdown` for immediate availability when any markdown file is opened
 - WebviewPanel uses `webview.asWebviewUri()` for secure local resource loading
 - Inline styles use VS Code CSS variables (`--vscode-*`) for theme integration
-- Consider adding Open VSX distribution in the future for VSCodium users
+- Published to both VS Code Marketplace and Open VSX (Cursor)
+- `deactivate()` is async to ensure pending edits are flushed on shutdown
+- SyncController has disposal guards to prevent double-flush bugs

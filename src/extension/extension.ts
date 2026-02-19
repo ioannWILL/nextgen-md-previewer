@@ -125,6 +125,6 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-export function deactivate() {
-  editorManager?.dispose();
+export async function deactivate(): Promise<void> {
+  await editorManager?.dispose();
 }

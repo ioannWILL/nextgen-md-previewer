@@ -2,7 +2,7 @@
   "name": "nextgen-md-previewer",
   "displayName": "NextGen .md Previewer",
   "description": "A WYSIWYG markdown editor for VS Code. Edit rendered markdown directly with formatting toolbar, syntax highlighting, and math equations.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "IvanVilchavskyi",
   "license": "MIT",
   "icon": "icon.png",

@@ -2,6 +2,14 @@
 
 All notable changes to the NextGen .md Previewer extension will be documented in this file.
 
+## [0.4.1] - 2026-02-19
+
+### Fixed
+- **Critical:** `deactivate()` now properly awaits async disposal to prevent data loss on extension shutdown
+- **Critical:** Added disposal guard to prevent double-flush bugs when SyncController is disposed twice
+- Fixed ESLint configuration to properly lint test files (created separate tsconfig.eslint.json)
+- Improved blockquote unwrap logic to correctly handle nested structures
+
 ## [0.4.0] - 2026-02-19
 
 ### Added

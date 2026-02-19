@@ -37,7 +37,8 @@ The extension produces two separate bundles via esbuild (`esbuild.config.mjs`):
 - `syncController.ts` - Two-way sync between TextDocument and webview with debounced auto-save
 
 **Webview Side** (`src/webview/`):
-- `index.ts` - Initializes Milkdown editor with commonmark + GFM presets, handles message passing
+- `index.ts` - Initializes Milkdown editor with commonmark + GFM + prism + math presets, handles message passing
+- `toolbar.ts` - Formatting toolbar with keyboard shortcuts and active state tracking
 
 ### Communication Flow
 
@@ -61,14 +62,25 @@ Activated via `editor/title/context` menu on markdown files. The command `nextge
   - `@milkdown/preset-commonmark` - Standard markdown
   - `@milkdown/preset-gfm` - GitHub Flavored Markdown
   - `@milkdown/plugin-listener` - Content change events
+  - `@milkdown/plugin-history` - Undo/redo support
+  - `@milkdown/plugin-prism` - Syntax highlighting
+  - `@milkdown/plugin-math` - KaTeX math rendering
 - **esbuild** - Bundler for both extension and webview code
+- **KaTeX** - LaTeX math rendering
+- **Prism.js** - Code syntax highlighting
 
-## Planned Features (Not Yet Implemented)
+## Implemented Features
 
-- Math equations (KaTeX) - `@milkdown/plugin-math` is deprecated in v7, needs custom integration
-- Mermaid diagrams - `@milkdown/plugin-diagram` is deprecated in v7, needs custom integration
-- Syntax highlighting for code blocks (Prism.js)
-- Floating toolbar
+- Math equations (KaTeX) - inline `$...$` and block `$$...$$`
+- Syntax highlighting (Prism.js) - 20+ languages
+- Fixed toolbar with formatting buttons (bold, italic, strikethrough, code, link, headings, blockquote)
+- Keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+K, Ctrl+Shift+S, Ctrl+Shift+C)
+- Image path resolution for local images
+
+## Not Yet Implemented
+
+- Mermaid diagrams - removed due to DOM conflicts with Milkdown (requires custom plugin)
+- Floating toolbar (current toolbar is fixed at top)
 - Image drag-and-drop handler
 
 ## Publishing
