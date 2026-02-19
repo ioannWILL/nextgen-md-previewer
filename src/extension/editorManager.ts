@@ -232,7 +232,8 @@ export class EditorManager implements vscode.Disposable {
       overflow-x: auto;
     }
     /* Mermaid diagrams */
-    .mermaid {
+    .mermaid,
+    .mermaid-diagram {
       display: flex;
       justify-content: center;
       margin: 16px 0;
@@ -240,7 +241,8 @@ export class EditorManager implements vscode.Disposable {
       background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.05));
       border-radius: 4px;
     }
-    .mermaid svg {
+    .mermaid svg,
+    .mermaid-diagram svg {
       max-width: 100%;
       height: auto;
     }

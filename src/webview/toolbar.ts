@@ -96,7 +96,6 @@ export class Toolbar {
         id: 'inlineCode',
         icon: '`',
         title: 'Inline Code',
-        shortcut: 'Ctrl+`',
         action: () => this.toggleInlineCode(),
       },
       {
@@ -313,12 +312,6 @@ export class Toolbar {
         return;
       }
 
-      // Ctrl+` - Inline Code
-      if (e.key === '`' && !e.shiftKey) {
-        e.preventDefault();
-        this.toggleInlineCode();
-        return;
-      }
 
       // Ctrl+Shift+C - Code Block
       if (e.key === 'C' && e.shiftKey) {

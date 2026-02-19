@@ -3,44 +3,12 @@ import { commonmark } from '@milkdown/preset-commonmark';
 import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
 import { history } from '@milkdown/plugin-history';
-import { prism, prismConfig } from '@milkdown/plugin-prism';
-import { math, mathBlockSchema } from '@milkdown/plugin-math';
-import { diagram, diagramSchema } from '@milkdown/plugin-diagram';
+import { prism } from '@milkdown/plugin-prism';
+import { math } from '@milkdown/plugin-math';
 import { replaceAll } from '@milkdown/utils';
 
-// Import KaTeX CSS as text and inject it
+// Import KaTeX CSS as text (will inject when DOM is ready)
 import katexCSS from 'katex/dist/katex.min.css';
-
-// Inject KaTeX CSS into the document
-const katexStyle = document.createElement('style');
-katexStyle.textContent = katexCSS;
-document.head.appendChild(katexStyle);
-
-// Import Prism core and languages
-import Prism from 'prismjs';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-jsx';
-import 'prismjs/components/prism-tsx';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-yaml';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-cpp';
-import 'prismjs/components/prism-csharp';
-import 'prismjs/components/prism-go';
-import 'prismjs/components/prism-rust';
-import 'prismjs/components/prism-sql';
-import 'prismjs/components/prism-ruby';
-import 'prismjs/components/prism-php';
-import 'prismjs/components/prism-swift';
-import 'prismjs/components/prism-kotlin';
-import 'prismjs/components/prism-docker';
-import 'prismjs/components/prism-diff';
 import type { ExtensionToWebviewMessage, WebviewToExtensionMessage } from '../shared/types';
 import { Toolbar } from './toolbar';
 
@@ -69,6 +37,12 @@ class WYSIWYGEditor {
       return;
     }
 
+    // Inject KaTeX CSS
+    const katexStyle = document.createElement('style');
+    katexStyle.textContent = katexCSS;
+    document.head.appendChild(katexStyle);
+
+
     // JSON.stringify on the extension side means initialContent is already properly parsed
     const initialContent = window.initialContent;
     this.lastKnownContent = initialContent;
@@ -78,14 +52,6 @@ class WYSIWYGEditor {
       .config((ctx) => {
         ctx.set(rootCtx, container);
         ctx.set(defaultValueCtx, initialContent);
-
-        // Configure Prism with custom highlighter
-        ctx.set(prismConfig.key, {
-          configureRefractor: () => {
-            // Return Prism (refractor-compatible)
-            return Prism;
-          },
-        });
 
         // Set up listener for content changes
         ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
@@ -100,7 +66,6 @@ class WYSIWYGEditor {
       .use(history)
       .use(prism)
       .use(math)
-      .use(diagram)
       .use(listener)
       .create();
 
@@ -212,6 +177,7 @@ class WYSIWYGEditor {
       attributeFilter: ['src'],
     });
   }
+
 }
 
 // Initialize editor when DOM is ready
