@@ -1,10 +1,28 @@
-.vscode/**
-.gitignore
+# Source files (only dist is needed)
 src/**
+*.ts
+!dist/**
+
+# Development files
+.vscode/**
 node_modules/**
-*.map
-.eslintrc.json
+coverage/**
+*.test.ts
+*.spec.ts
+vitest.config.ts
+
+# Config files
+.eslintrc*
+eslint.config.*
 tsconfig.json
 esbuild.config.mjs
-**/*.ts
-!dist/**
+.gitignore
+
+# Documentation (keep README and CHANGELOG)
+CLAUDE.md
+CTO-PROJECT.md
+test.md
+
+# Other
+*.vsix
+.git/**
