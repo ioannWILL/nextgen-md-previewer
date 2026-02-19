@@ -143,6 +143,68 @@ export class EditorManager implements vscode.Disposable {
       background: transparent;
       padding: 0;
     }
+    /* Prism.js Syntax Highlighting - VS Code Theme Compatible */
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata {
+      color: var(--vscode-editorLineNumber-foreground, #6a9955);
+      font-style: italic;
+    }
+    .token.punctuation {
+      color: var(--vscode-editor-foreground, #d4d4d4);
+    }
+    .token.namespace {
+      opacity: 0.7;
+    }
+    .token.property,
+    .token.tag,
+    .token.boolean,
+    .token.number,
+    .token.constant,
+    .token.symbol,
+    .token.deleted {
+      color: var(--vscode-debugTokenExpression-number, #b5cea8);
+    }
+    .token.selector,
+    .token.attr-name,
+    .token.string,
+    .token.char,
+    .token.builtin,
+    .token.inserted {
+      color: var(--vscode-debugTokenExpression-string, #ce9178);
+    }
+    .token.operator,
+    .token.entity,
+    .token.url,
+    .language-css .token.string,
+    .style .token.string {
+      color: var(--vscode-symbolIcon-operatorForeground, #d4d4d4);
+    }
+    .token.atrule,
+    .token.attr-value,
+    .token.keyword {
+      color: var(--vscode-debugTokenExpression-name, #569cd6);
+    }
+    .token.function,
+    .token.class-name {
+      color: var(--vscode-symbolIcon-functionForeground, #dcdcaa);
+    }
+    .token.regex,
+    .token.important,
+    .token.variable {
+      color: var(--vscode-debugTokenExpression-value, #d16969);
+    }
+    .token.important,
+    .token.bold {
+      font-weight: bold;
+    }
+    .token.italic {
+      font-style: italic;
+    }
+    .token.entity {
+      cursor: help;
+    }
     /* Inline code */
     code {
       font-family: var(--vscode-editor-font-family, 'Consolas', 'Courier New', monospace);

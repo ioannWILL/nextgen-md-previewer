@@ -3,7 +3,34 @@ import { commonmark } from '@milkdown/preset-commonmark';
 import { gfm } from '@milkdown/preset-gfm';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
 import { history } from '@milkdown/plugin-history';
+import { prism, prismConfig } from '@milkdown/plugin-prism';
 import { replaceAll } from '@milkdown/utils';
+
+// Import Prism core and languages
+import Prism from 'prismjs';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-csharp';
+import 'prismjs/components/prism-go';
+import 'prismjs/components/prism-rust';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-ruby';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-swift';
+import 'prismjs/components/prism-kotlin';
+import 'prismjs/components/prism-docker';
+import 'prismjs/components/prism-diff';
 import type { ExtensionToWebviewMessage, WebviewToExtensionMessage } from '../shared/types';
 import { Toolbar } from './toolbar';
 
@@ -41,6 +68,14 @@ class WYSIWYGEditor {
         ctx.set(rootCtx, container);
         ctx.set(defaultValueCtx, initialContent);
 
+        // Configure Prism with custom highlighter
+        ctx.set(prismConfig.key, {
+          configureRefractor: () => {
+            // Return Prism (refractor-compatible)
+            return Prism;
+          },
+        });
+
         // Set up listener for content changes
         ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
           if (!this.isExternalUpdate) {
@@ -52,6 +87,7 @@ class WYSIWYGEditor {
       .use(commonmark)
       .use(gfm)
       .use(history)
+      .use(prism)
       .use(listener)
       .create();
 
